@@ -1,8 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
  import './home.dart';
  import './create.dart';
-
-void main() => runApp(  MyApp());
+import 'authentication_service.dart';
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+   runApp(MyApp()
+  );
+  runApp(MyApp());
+}
  
 class MyApp extends StatelessWidget {
  
@@ -11,21 +20,43 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MultiProvider(
+    providers:[ 
+      Provider<AuthenticationService>(
+        create:(_)=> AuthenticationService(FirebaseAuth.instance),
+        ),
+        StreamProvider(create: (context)=>context.read<AuthenticationService>().authStateChanges),
+
+    ],
+    child: MaterialApp(
         debugShowCheckedModeBanner:false,
       title: "Flutter App",
-      home: Scaffold(
-        appBar: AppBar(title: const Text(_title)),
-        body: const MyStatefulWidget(),
+      
+      
        
-      ),
+    
       theme:ThemeData(
       primarySwatch: Colors.purple,
        ),
+       home:AuthenticationWrapper(),
+    )
     );
   }
 }
  
+ class AuthenticationWrapper extends StatelessWidget{
+
+  @override
+  Widget build(BuildContext context) {
+    var firebaseUser=context.watch<User>();
+    if(firebaseUser!= null){
+      return Text("Signed in");
+
+    }
+    return Text("not signedin");
+
+  }
+ }
 class MyStatefulWidget extends StatefulWidget {
   const MyStatefulWidget({Key? key}) : super(key: key);
  
@@ -62,6 +93,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             Container(
                 alignment: Alignment.center,
                 padding: const EdgeInsets.all(10),
+
                 child: const Text(
                   'Sign in',
                   style: TextStyle(fontSize: 20),
@@ -118,7 +150,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                   child: const Text('Login'),
                   onPressed: () {
                  
-                  
+                  context.read<AuthenticationService>().signIn(email: emailController.text,
+                   password: passwordController.text,);
                     Navigator.push(
                               context,
                               MaterialPageRoute(builder: (context) => MyLogin() ),
@@ -150,12 +183,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           ],
         )
         );
-        Future SignIn() async{
-    await FirebaseAuth instance.signInwithAndPassword();
-    email:emailController.text.trim(),
-    password:passwordController.text.trim(),
-    );
-  }
+        
 
      
   }
