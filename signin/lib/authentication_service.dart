@@ -5,8 +5,8 @@ class AuthenticationService{
     final FirebaseAuth _firebaseAuth;
 
   AuthenticationService(this._firebaseAuth);
-  Stream<User?>get authStateChanges=>_firebaseAuth.authStateChanges();
-Future<String?>signIn({ required String email,required String password}) async{
+  Stream<User>get authStateChanges=>_firebaseAuth.authStateChanges();
+Future<String>signIn({  String email,String password}) async{
   try{
     await _firebaseAuth.signInWithEmailAndPassword(email:email,password:password);
     return "Signed in";
@@ -17,7 +17,7 @@ Future<String?>signIn({ required String email,required String password}) async{
   }
 
 }
-Future<String?>signup({required String email,required String password}) async {
+Future<String>signup({ String email, String password}) async {
 try{
   await _firebaseAuth.createUserWithEmailAndPassword(email:email,password:password);
   return "Signed Up";
