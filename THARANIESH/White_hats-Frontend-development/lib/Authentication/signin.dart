@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:white_hats/Authentication/Login.dart';
 import 'package:white_hats/Widgets/Constants.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:white_hats/Authentication_service.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class signIn extends StatefulWidget {
   const signIn({Key? key}) : super(key: key);
@@ -12,6 +16,15 @@ class signIn extends StatefulWidget {
 class _signInState extends State<signIn> {
   bool _passwordVisible = true;
   bool isChecked = false;
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  @override
+  void dispose(){
+    emailController.dispose();
+    passwordController.dispose();
+
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -151,6 +164,7 @@ class _signInState extends State<signIn> {
                             padding: const EdgeInsets.only(
                                 left: 10.0, right: 10.0, top: 5),
                             child: TextField(
+                              controller: emailController,
                               decoration: InputDecoration(
                                   enabledBorder: UnderlineInputBorder(
                                     borderSide:
@@ -182,6 +196,7 @@ class _signInState extends State<signIn> {
                             padding: const EdgeInsets.only(
                                 left: 10.0, right: 10.0, top: 5),
                             child: TextField(
+                              controller: passwordController,
                               decoration: InputDecoration(
                                   enabledBorder: UnderlineInputBorder(
                                     borderSide:
@@ -263,5 +278,14 @@ class _signInState extends State<signIn> {
         ]),
       ),
     );
+
+    Future SignIn()async{
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email:emailController.text.trim(),
+        password:passwordController.text.trim(),
+      );
+
+
+    }
   }
 }

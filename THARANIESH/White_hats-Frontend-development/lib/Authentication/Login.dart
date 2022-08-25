@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:white_hats/Authentication/signin.dart';
+
 import 'package:white_hats/Widgets/Constants.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
+
+import 'signin.dart';
 
 class logIn extends StatefulWidget {
   const logIn({Key? key}) : super(key: key);
@@ -12,7 +17,15 @@ class logIn extends StatefulWidget {
 class _logInState extends State<logIn> {
   bool _passwordVisible = true;
   bool isChecked = false;
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  @override
+  void dispose(){
+  emailController.dispose();
+  passwordController.dispose();
 
+  super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -121,6 +134,8 @@ class _logInState extends State<logIn> {
                             padding: const EdgeInsets.only(
                                 left: 10.0, right: 10.0, top: 5),
                             child: TextField(
+
+                              controller:emailController,
                               decoration: InputDecoration(
                                   enabledBorder: UnderlineInputBorder(
                                     borderSide:
@@ -156,6 +171,7 @@ class _logInState extends State<logIn> {
                             padding: EdgeInsets.only(
                                 left: 10.0, right: 10.0, top: 5),
                             child: TextField(
+                              controller: passwordController,
                               decoration: InputDecoration(
                                   enabledBorder: UnderlineInputBorder(
                                     borderSide:
@@ -228,5 +244,13 @@ class _logInState extends State<logIn> {
         ]),
       ),
     );
+    Future signIn() async{
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email:emailController.text.trim(),
+        password:passwordController.text.trim(),
+      );
+    } on FirebaseAuthException catch (e){
+      print(e);
+    }
   }
 }

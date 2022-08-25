@@ -6,48 +6,52 @@ import 'package:white_hats/Authentication/signin.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:white_hats/Authentication_service.dart';
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-   runApp(MyApp()
-  );
+import 'package:firebase_database/firebase_database.dart';
 
+void main() {
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-    providers:[ 
-      Provider<AuthenticationService>(
-        create:(_)=> AuthenticationService(FirebaseAuth.instance),
-        ),
-        StreamProvider(create: (context)=>context.read<AuthenticationService>().authStateChanges),
-
-    ],
-    child: MaterialApp(
-        debugShowCheckedModeBanner:false,
-         theme:ThemeData(
-      primarySwatch: Colors.blue,
-       ),
-       home:AuthenticationWrapper(),
-    )
+    return MaterialApp(
+      theme: ThemeData(
+          primarySwatch: Colors.blue, unselectedWidgetColor: Colors.white),
+      debugShowCheckedModeBanner: false,
+      home: signIn(),
     );
   }
-}
-class AuthenticationWrapper extends StatelessWidget{
-const AuthenticationWrapper({
-  Key? Key,
-}): super(key:Key);
-  @override
-  Widget build(BuildContext context) {
-    final firebaseUser=context.watch<User>();
-    if(firebaseUser!= null){
-      return Text("Signed in");
+  
+     class logIn extends StatelessWidget{
+      @override
+      Widget build(BuildContext Context)=>Scaffold(
+        body:StreamBuilder<User?>(
+          stream:FirebaseAuth.instance.authStateChanges(),
+            builder:(context,snapshot){
+              if (snapshot.connectionState ==ConnectionState.waiting)
+              { return Center(child:CircularProgressIndicator());
+              }
+              else if (snapshot.hasError){
+                return Center(child:Text('something went wrong !'));
 
-    }
-    return Text("not signedin");
+              } 
+              
+  
+
+              else if(snapshot.hasData){
+      return signIn();
+      }
+                else{
+                return logIn();
+      }
+
+      },
+
+
+      ),
+    );
 
   }
- }
+}
